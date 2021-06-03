@@ -1,0 +1,25 @@
+{
+  "name": "@seneca/reload",
+  "version": "0.0.1",
+  "description": "Reload action definitions when source files change.",
+  "main": "reload.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senecajs/seneca-reload.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/senecajs/seneca-reload/issues"
+  },
+  "homepage": "https://github.com/senecajs/seneca-reload#readme",
+  "dependencies": {
+    "@seneca/repl": "^4.0.1",
+    "chokidar": "^3.5.1",
+    "seneca": "^3.23.3",
+    "seneca-promisify": "^2.0.0"
+  }
+}
