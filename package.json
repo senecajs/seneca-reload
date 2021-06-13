@@ -1,10 +1,16 @@
 {
   "name": "@seneca/reload",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Reload action definitions when source files change.",
   "main": "reload.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo no-test",
+    "prettier": "prettier --write --no-semi --single-quote *.js test/*.js",
+    "reset": "npm run clean && npm i && npm test",
+    "clean": "rm -rf node_modules package-lock.json yarn.lock",
+    "repo-tag": "REPO_VERSION=`node -e \"console.log(require('./package').version)\"` && echo TAG: v$REPO_VERSION && git commit -a -m v$REPO_VERSION && git push && git tag v$REPO_VERSION && git push --tags;",
+    "repo-publish": "npm run clean && npm i --registry=http://registry.npmjs.org && npm run repo-publish-quick",
+    "repo-publish-quick": "npm run prettier && npm test && npm run repo-tag && npm publish --access public --registry=http://registry.npmjs.org"
   },
   "repository": {
     "type": "git",
@@ -17,9 +23,12 @@
   },
   "homepage": "https://github.com/senecajs/seneca-reload#readme",
   "dependencies": {
+    "chokidar": "^3.5.1"
+  },
+  "devDependencies": {
     "@seneca/repl": "^4.0.1",
-    "chokidar": "^3.5.1",
     "seneca": "^3.23.3",
-    "seneca-promisify": "^2.0.0"
+    "seneca-promisify": "^2.0.0",
+    "prettier": "^2.3.1"
   }
 }
