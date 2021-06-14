@@ -15,7 +15,7 @@ function reload(options) {
     return {
       exportmap: {
         make: function (plugin_require) {
-          let reload = function(path) {
+          let reload = function (path) {
             let make_args = [...arguments].slice(1)
 
             let make = plugin_require(path)
@@ -71,19 +71,21 @@ function reload(options) {
 
           let make = plugin_require(path)
           let action = make(...make_args)
-          
+
           update_watch()
 
           let reload = function () {
             // TODO: avoid doing this on each call
             make = plugin_require(path)
             action = make(...make_args)
-            
+
             return action.call(this, ...arguments)
           }
 
-          Object.defineProperty(reload, 'name', { value: 'reload_'+action.name })
-          
+          Object.defineProperty(reload, 'name', {
+            value: 'reload_' + action.name,
+          })
+
           return reload
         }
       },

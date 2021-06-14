@@ -1,6 +1,6 @@
 {
   "name": "@seneca/reload",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Reload action definitions when source files change.",
   "main": "reload.js",
   "scripts": {
