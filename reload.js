@@ -1,5 +1,3 @@
-// TODO: turn it off via an option for production
-
 const Module = require('module')
 
 const { FSWatcher } = require('chokidar')
@@ -7,7 +5,7 @@ const { FSWatcher } = require('chokidar')
 module.exports = reload
 
 module.exports.defaults = {
-  active: true,
+  active: true, // NOTE: set to false for production!
 }
 
 function reload(options) {
@@ -17,18 +15,16 @@ function reload(options) {
     return {
       exportmap: {
         make: function (plugin_require) {
-          return function reload(path) {
+          let reload = function(path) {
             let make_args = [...arguments].slice(1)
 
-            let reloading_action = function () {
-              // TODO: avoid doing this on each call
-              let make = plugin_require(path)
-              let action = make(...make_args)
-              return action.call(this, ...arguments)
-            }
+            let make = plugin_require(path)
+            let action = make(...make_args)
 
-            return reloading_action
+            return action
           }
+
+          return reload
         },
       },
     }
@@ -73,16 +69,22 @@ function reload(options) {
           headpath = plugin_require.resolve(path)
           filepaths[headpath] = 1
 
-          let reloading_action = function () {
-            // TODO: avoid doing this on each call
-            let make = plugin_require(path)
-            update_watch()
+          let make = plugin_require(path)
+          let action = make(...make_args)
+          
+          update_watch()
 
-            let action = make(...make_args)
+          let reload = function () {
+            // TODO: avoid doing this on each call
+            make = plugin_require(path)
+            action = make(...make_args)
+            
             return action.call(this, ...arguments)
           }
 
-          return reloading_action
+          Object.defineProperty(reload, 'name', { value: 'reload_'+action.name })
+          
+          return reload
         }
       },
     },
