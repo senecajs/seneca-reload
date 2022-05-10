@@ -1,4 +1,5 @@
 const Module = require('module')
+const Path = require('path')
 
 const { FSWatcher } = require('chokidar')
 
@@ -66,24 +67,51 @@ function reload(options) {
       make: function (plugin_require) {
         return function reload(path) {
           let make_args = [...arguments].slice(1)
-          headpath = plugin_require.resolve(path)
+
+          let found = false
+          let headpath
+          
+          try {
+            headpath = plugin_require.resolve(path)
+            found = true
+          }
+          catch(e) {
+
+            // If not found, watch action path for creation.
+            // NOTE: calls to the action will still fail.
+            if('MODULE_NOT_FOUND' === e.code) {
+              const searchpaths = plugin_require.resolve.paths(path)
+              headpath = Path.join(searchpaths[0],path)
+            }
+            else {
+              throw e
+            }
+          }
+
           filepaths[headpath] = 1
 
-          let make = plugin_require(path)
-          let action = make(...make_args)
-
+          let make
+          let action
+          let action_name = path.replace(/[^a-bA-B0-9_]/g, '_')
+          
+          if(found) {
+            make = plugin_require(path)
+            action = make(...make_args)
+            action_name = action.name
+          }
+          
           update_watch()
 
           let reload = function () {
             // TODO: avoid doing this on each call
             make = plugin_require(path)
             action = make(...make_args)
-
+            
             return action.call(this, ...arguments)
           }
 
           Object.defineProperty(reload, 'name', {
-            value: 'reload_' + action.name,
+            value: 'reload_' + action_name,
           })
 
           return reload
