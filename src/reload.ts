@@ -1,22 +1,19 @@
-const Module = require('module')
-const Path = require('path')
+/* Copyright © 2021-2022 Richard Rodger, MIT License. */
 
-const { FSWatcher } = require('chokidar')
+import Module from 'module'
+import Path from 'path'
 
-module.exports = reload
+import { FSWatcher } from 'chokidar'
 
-module.exports.defaults = {
-  active: true, // NOTE: set to false for production!
-}
 
-function reload(options) {
+function reload(this: any, options: any) {
   let seneca = this
 
   if (!options.active) {
     return {
       exportmap: {
-        make: function (plugin_require) {
-          let reload = function (path) {
+        make: function(plugin_require: any) {
+          let reload = function(path: string) {
             let make_args = [...arguments].slice(1)
 
             let make = plugin_require(path)
@@ -32,27 +29,27 @@ function reload(options) {
   }
 
   const orig_require = Module.prototype.require
-  const filepaths = {}
+  const filepaths: any = {}
   const watch = new FSWatcher()
   watch.on('change', clear_require)
 
   function update_watch() {
-    for (fp in filepaths) {
+    for (let fp in filepaths) {
       seneca.log.debug('WATCH', fp)
       watch.add(fp)
     }
   }
 
   function clear_require() {
-    for (fp in filepaths) {
+    for (let fp in filepaths) {
       seneca.log.debug('CLEAR', fp)
       delete require.cache[fp]
     }
   }
 
-  Module.prototype.require = function require(path) {
+  (Module as any).prototype.require = function require(path: string) {
     const target = orig_require.call(this, path)
-    const fullpath = Module._resolveFilename(path, this)
+    const fullpath = (Module as any)._resolveFilename(path, this)
 
     // TODO: all reload files get flushed - narrow this to each reload call
     if (filepaths[this.filename]) {
@@ -64,24 +61,24 @@ function reload(options) {
 
   return {
     exportmap: {
-      make: function (plugin_require) {
-        return function reload(path) {
+      make: function(plugin_require: any) {
+        return function reload(path: any) {
           let make_args = [...arguments].slice(1)
 
           let found = false
           let headpath
-          
+
           try {
             headpath = plugin_require.resolve(path)
             found = true
           }
-          catch(e) {
+          catch (e: any) {
 
             // If not found, watch action path for creation.
             // NOTE: calls to the action will still fail.
-            if('MODULE_NOT_FOUND' === e.code) {
+            if ('MODULE_NOT_FOUND' === e.code) {
               const searchpaths = plugin_require.resolve.paths(path)
-              headpath = Path.join(searchpaths[0],path)
+              headpath = Path.join(searchpaths[0], path)
             }
             else {
               throw e
@@ -93,20 +90,20 @@ function reload(options) {
           let make
           let action
           let action_name = path.replace(/[^a-bA-B0-9_]/g, '_')
-          
-          if(found) {
+
+          if (found) {
             make = plugin_require(path)
             action = make(...make_args)
             action_name = action.name
           }
-          
+
           update_watch()
 
-          let reload = function () {
+          let reload = function(this: any) {
             // TODO: avoid doing this on each call
             make = plugin_require(path)
             action = make(...make_args)
-            
+
             return action.call(this, ...arguments)
           }
 
@@ -119,4 +116,16 @@ function reload(options) {
       },
     },
   }
+}
+
+
+reload.defaults = {
+  active: true, // NOTE: set to false for production!
+}
+
+
+export default reload
+
+if ('undefined' !== typeof (module)) {
+  module.exports = reload
 }

@@ -8,3 +8,6 @@ s0.use('promisify')
   .use('./p0')
   .act('role:p0,color:red', s0.util.print)
   .act('role:p0,color:green', s0.util.print)
+  // .ready(function() {
+  //   console.log(this.private$.exports)
+  // })
