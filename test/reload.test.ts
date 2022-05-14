@@ -12,7 +12,7 @@ describe('reload', () => {
   })
 
 
-  test('first-loas', async () => {
+  test('first-load', async () => {
     const s0 = await Seneca({ legacy: false })
       .test()
       .use('promisify')

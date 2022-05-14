@@ -59,6 +59,17 @@ function reload(this: any, options: any) {
     return target
   }
 
+
+  seneca.add('role:seneca,cmd:close', function(this: any, msg: any, reply: any) {
+    const seneca = this
+    watch
+      .close()
+      .then(() => seneca.prior(msg, reply))
+      .catch((err) => reply(err))
+  })
+
+
+
   return {
     exportmap: {
       make: function(plugin_require: any) {
