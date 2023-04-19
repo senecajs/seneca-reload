@@ -35,14 +35,18 @@ function reload(this: any, options: any) {
 
   function update_watch() {
     for (let fp in filepaths) {
-      seneca.log.debug('WATCH', fp)
+      if (options.log.watchfile) {
+        seneca.log.debug('WATCH', fp)
+      }
       watch.add(fp)
     }
   }
 
   function clear_require() {
     for (let fp in filepaths) {
-      seneca.log.debug('CLEAR', fp)
+      if (options.log.watchfile) {
+        seneca.log.debug('CLEAR', fp)
+      }
       delete require.cache[fp]
     }
   }
@@ -132,6 +136,9 @@ function reload(this: any, options: any) {
 
 reload.defaults = {
   active: true, // NOTE: set to false for production!
+  log: {
+    watchfile: false
+  }
 }
 
 
