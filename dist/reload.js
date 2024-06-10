@@ -108,7 +108,7 @@ function reload(options) {
     };
 }
 reload.defaults = {
-    active: true,
+    active: true, // NOTE: set to false for production!
     log: {
         watchfile: false
     }
