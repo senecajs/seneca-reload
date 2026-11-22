@@ -53,12 +53,9 @@ function reload(options) {
         }
         return target;
     };
-    seneca.add('role:seneca,cmd:close', function (msg, reply) {
-        const seneca = this;
-        watch
-            .close()
-            .then(() => seneca.prior(msg, reply))
-            .catch((err) => reply(err));
+    // Stop watching files when the Seneca instance closes.
+    seneca.destroy(async function reload_close_watch() {
+        await watch.close();
     });
     return {
         exportmap: {
