@@ -16,8 +16,11 @@
 ## Install
 
 ```sh
-npm install @seneca/reload
+npm install seneca@^4 @seneca/reload
 ```
+
+Version 0.6 needs Seneca 4 and Node.js 24 or later. For Seneca 3, use
+`@seneca/reload@0.5`.
 
 ## Quick Example
 

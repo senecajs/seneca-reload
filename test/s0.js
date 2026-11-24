@@ -2,8 +2,7 @@ const Seneca = require('seneca')
 
 let s0 = Seneca({ legacy: false, log: 'flat' })
 
-s0.use('promisify')
-  .use('repl')
+s0.use('@seneca/repl')
   .use('..', { active: 'off' !== process.argv[2] })
   .use('./p0')
   .act('role:p0,color:red', s0.util.print)

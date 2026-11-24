@@ -64,12 +64,9 @@ function reload(this: any, options: any) {
   }
 
 
-  seneca.add('role:seneca,cmd:close', function(this: any, msg: any, reply: any) {
-    const seneca = this
-    watch
-      .close()
-      .then(() => seneca.prior(msg, reply))
-      .catch((err) => reply(err))
+  // Stop watching files when the Seneca instance closes.
+  seneca.destroy(async function reload_close_watch() {
+    await watch.close()
   })
 
 
